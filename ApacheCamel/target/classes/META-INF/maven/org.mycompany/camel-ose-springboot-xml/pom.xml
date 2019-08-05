@@ -63,6 +63,16 @@
 			<artifactId>camel-ftp-starter</artifactId>
 			<!-- use the same version as your Camel core version -->
 		</dependency>
+<dependency>
+    <groupId>org.apache.activemq</groupId>
+    <artifactId>activemq-all</artifactId>
+    <version>5.15.9</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.activemq</groupId>
+    <artifactId>activemq-client</artifactId>
+    <version>5.15.9</version>
+</dependency>
 
 
 		<dependency>
@@ -74,7 +84,12 @@
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jackson</artifactId>
 		</dependency>
-
+		
+<dependency>
+    <groupId>org.apache.camel</groupId>
+    <artifactId>camel-jms</artifactId>
+</dependency>
+  
 	</dependencies>
 
 	<build>
