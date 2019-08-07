@@ -15,20 +15,58 @@
  */
 package org.mycompany;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jms.ConnectionFactory;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.jms.JmsComponent;
+import org.apache.camel.component.properties.PropertiesComponent;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.mycompany.ExchangeHeaders.HandleHeaders;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.PropertySource;
 
 /**
- * A spring-boot application that includes a Camel route builder to setup the Camel routes
+ * A spring-boot application that includes a Camel route builder to setup the
+ * Camel routes
  */
 @SpringBootApplication
-@ImportResource({"classpath:spring/camel-context.xml"})
+@PropertySource("classpath:myProperties.properties")
 public class Application {
 
-    // must have a main method spring-boot can run
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+	// must have a main method spring-boot can run
+	public static void main(String[] args) throws Exception {
+		SpringApplication.run(Application.class, args);	
+		
+
+
+		CamelContext context = new DefaultCamelContext();
+
+		ConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+		context.addComponent("activemq", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
+		
+		
+		
+		PropertiesComponent pc = new PropertiesComponent();
+		pc.setLocation("classpath:myProperties.properties"); 
+		context.addComponent("properties", pc);
+
+		context.addRoutes(new HandleHeaders());
+
+		ProducerTemplate producer = context.createProducerTemplate();
+		Map<String, Object> headers = new HashMap();
+		headers.put("user", "Amit");
+		headers.put("role", "Admin");
+
+		producer.sendBodyAndHeaders("seda:startHeader", "Welcome processing for Headers", headers);
+		context.start();
+		Thread.sleep(3000);
+
+	}
 
 }
