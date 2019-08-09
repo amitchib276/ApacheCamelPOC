@@ -27,6 +27,8 @@ import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.mycompany.ExchangeHeaders.HandleHeaders;
+import org.mycompany.errorHandling.MyExceptionHandling;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
@@ -41,31 +43,32 @@ public class Application {
 
 	// must have a main method spring-boot can run
 	public static void main(String[] args) throws Exception {
-		SpringApplication.run(Application.class, args);	
-		
-
+		SpringApplication.run(Application.class, args);
 
 		CamelContext context = new DefaultCamelContext();
 
 		ConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		context.addComponent("activemq", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
-		
-		
-		
+
 		PropertiesComponent pc = new PropertiesComponent();
-		pc.setLocation("classpath:myProperties.properties"); 
+		pc.setLocation("classpath:myProperties.properties");	
+		
 		context.addComponent("properties", pc);
-
+		
+		
+		//Add here the routes you want to run
 		context.addRoutes(new HandleHeaders());
-
+		context.addRoutes(new MyExceptionHandling());
+		
+		
+		context.start();
+		Thread.sleep(3000);
 		ProducerTemplate producer = context.createProducerTemplate();
 		Map<String, Object> headers = new HashMap();
 		headers.put("user", "Amit");
 		headers.put("role", "Admin");
 
-		producer.sendBodyAndHeaders("seda:startHeader", "Welcome processing for Headers", headers);
-		context.start();
-		Thread.sleep(3000);
+		producer.sendBodyAndHeaders("direct:inputA", "Welcome processing for Headers", headers);
 
 	}
 

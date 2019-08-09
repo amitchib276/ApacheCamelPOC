@@ -28,8 +28,8 @@ public class XmlToJson extends DefaultCamelContext {
 
 				
 				from("file:target/xmlToJson?noop=true")
-						.unmarshal(xmlDataFormat).log("{$body}").process(new MyProcessor()).marshal(jsonDataFormat)
-						.log("{$body}").to("file:target/cbr/output");
+						.unmarshal(xmlDataFormat).log("${body}").process(new MyProcessor()).marshal(jsonDataFormat)
+						.log("${body}").to("file:target/cbr/output");
 
 			}
 
